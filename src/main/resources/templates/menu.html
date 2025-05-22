@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navigation Menu</title>
+<!-- Bootstrap & Font Awesome -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+	<nav
+		class="navbar navbar-expand-lg navbar-light animate__animated animate__fadeInDown">
+		<input type="hidden" id="accountId"
+			th:value="${session.account != null ? session.account.id : 0}" />
+
+		<div class="container">
+			<a class="navbar-brand fw-bold" href="/home/index"> <i
+				class="fas fa-shopping-bag me-2"></i>ShopOnline
+			</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto align-items-lg-center">
+					<!-- Home -->
+					<li class="nav-item mx-2"><a class="nav-link"
+						href="/home/index"> <i class="fas fa-home me-1"></i>Trang chủ
+					</a></li>
+					<!-- Cart: Số lượng cập nhật qua REST API -->
+					<li class="nav-item mx-2"><a class="nav-link" href="/cart">
+							<i class="fas fa-shopping-cart me-1"></i>Giỏ hàng <span
+							id="cartItemCount" class="badge bg-secondary ms-1">0</span>
+					</a></li>
+					<!-- Orders -->
+					<li class="nav-item mx-2"><a class="nav-link"
+						href="/order/detail"> <i class="fas fa-clipboard-list me-1"></i>Đơn
+							hàng
+					</a></li>
+					<!-- Dropdown Account -->
+					<li class="nav-item dropdown mx-2"><a
+						class="nav-link dropdown-toggle" href="#" role="button"
+						data-bs-toggle="dropdown" aria-expanded="false"
+						data-bs-display="static"
+						th:text="${session.account != null ? session.account.fullname : 'Account'}">
+					</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li th:if="${session.account == null}"><a
+								class="dropdown-item" href="/account/register"> <i
+									class="fas fa-user-plus me-2"></i>Đăng ký
+							</a></li>
+							<li th:if="${session.account == null}"><a
+								class="dropdown-item" href="/auth/login"> <i
+									class="fas fa-sign-in-alt me-2"></i>Đăng nhập
+							</a></li>
+							<li th:if="${session.account == null}"><a
+								class="dropdown-item" href="/account/activate"> <i
+									class="fas fa-envelope me-2"></i>Kích hoạt tài khoản
+							</a></li>
+							<li><a class="dropdown-item" href="/account/update"> <i
+									class="fas fa-user-edit me-2"></i>Cập nhật thông tin
+							</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item" href="/account/change-password">
+									<i class="fas fa-lock me-2"></i>Đổi mật khẩu
+							</a></li>
+							<li th:if="${session.account == null}"><a
+								class="dropdown-item" href="/account/forgot-password"> <i
+									class="fas fa-key me-2"></i>Lấy lại mật khẩu
+							</a></li>
+							<li th:if="${session.account != null}"><a
+								class="dropdown-item" href="/account/delete"
+								onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản không?');">
+									<i class="fas fa-trash-alt me-2"></i>Xóa tài khoản
+							</a></li>
+							<li th:if="${session.account != null}"><a
+								class="dropdown-item" href="/account/logout"> <i
+									class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+							</a></li>
+						</ul></li>
+					<!-- Search Form -->
+					<li class="nav-item ms-3" th:if="${isHomePage}">
+						<form class="d-flex" th:action="@{/home/search}" method="get">
+							<div class="input-group">
+								<input class="form-control rounded-pill me-2" type="search"
+									placeholder="Tìm kiếm..." aria-label="Search" name="query"
+									style="min-width: 250px;">
+								<button class="btn btn-outline-secondary rounded-pill"
+									type="submit">
+									<i class="fas fa-search"></i>
+								</button>
+							</div>
+						</form>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<script th:inline="javascript">
+      /* Sử dụng th:inline="javascript" để Thymeleaf xử lý biểu thức */
+      var accountId = /*[[${session.account != null ? session.account.id : 0}]]*/ 0;
+      if (accountId != 0) {
+          fetch('/api/cart/' + accountId)
+              .then(function(response) {
+                  return response.json();
+              })
+              .then(function(data) {
+                  var count = data.reduce(function(sum, item) {
+                      return sum + item.quantity;
+                  }, 0);
+                  document.getElementById('cartItemCount').textContent = count;
+              })
+              .catch(function(error) {
+                  console.error('Lỗi khi lấy số lượng giỏ hàng:', error);
+              });
+      } else {
+          document.getElementById('cartItemCount').textContent = 0;
+      }
+    </script>
+	</nav>
+</body>
+</html>

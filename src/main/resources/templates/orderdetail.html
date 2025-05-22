@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders - ShopOnline</title>
+</head>
+<body>
+	<article class="order-confirmation-container">
+		<header class="order-confirmation-header">
+			<h2>
+				<i class="fas fa-shopping-bag me-2"></i>Đơn hàng của bạn
+			</h2>
+		</header>
+
+		<!-- Display message if there are no orders -->
+		<div th:if="${#lists.isEmpty(orders)}" class="empty-order-message">
+			<p>Bạn không có bất kỳ đơn hàng nào</p>
+			<a href="/home/index" class="btn btn-primary">Mua sắm ngay</a>
+		</div>
+
+		<!-- Loop over orders -->
+		<div class="order-confirmation-list" th:each="order : ${orders}">
+			<div class="order-confirmation-card">
+				<div class="order-meta">
+					<span class="order-date"
+						th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></span>
+					<span class="order-status" th:text="${order.status}"></span>
+				</div>
+				<div class="order-contact">
+					<span class="order-address" th:text="${order.address}"></span> <span
+						class="order-phone" th:text="${order.phonenumber}"></span>
+				</div>
+				<div class="order-items">
+					<div th:if="${#lists.isEmpty(order.orderDetails)}"
+						class="no-items-message">
+						<p>No items found.</p>
+					</div>
+					<div th:each="detail : ${order.orderDetails}"
+						class="order-item-card">
+						<img
+							th:src="@{/photos/{filename}(filename=${detail.product.image})}"
+							alt="Product Image" class="item-image">
+						<div class="item-details">
+							<p class="item-name" th:text="${detail.product.name}"></p>
+							<p class="item-qty" th:text="'Số lượng: ' + ${detail.quantity}"></p>
+							<p class="item-price" th:text="'Giá: $' + ${detail.price}"></p>
+							<p class="item-total"
+								th:text="'Thành tiền: $' + ${detail.price.multiply(T(java.math.BigDecimal).valueOf(detail.quantity * 1L))}"></p>
+						</div>
+					</div>
+				</div>
+				<div class="order-summary-section">
+					<div class="summary-line">
+						<span>Tổng thanh toán:</span> <span
+							th:text="'$' + ${order.totalAmount}"></span>
+					</div>
+				</div>
+				<div class="order-actions">
+					<!-- Show cancel button only if order status is "Chờ xác nhận" -->
+					<div th:if="${order.status == 'Chờ xác nhận'}">
+						<a th:href="@{/order/delete(orderId=${order.id})}"
+							class="btn btn-danger"
+							onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng?');">
+							<i class="fas fa-times"></i> Hủy đơn hàng
+						</a>
+					</div>
+					<!-- Show message if the order has been confirmed or processed -->
+					<div th:if="${order.status != 'Chờ xác nhận'}">
+						<span class="text-muted">Đơn hàng đã được xử lý, không thể
+							hủy.</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+</body>
+</html>

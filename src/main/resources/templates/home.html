@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Trang chủ</title>
+
+</head>
+<body>
+	<div class="container-fluid">
+		<article class="row mt-4">
+			<input type="hidden" id="accountId"
+				th:value="${session.account != null ? session.account.id : 0}" />
+
+			<!-- Sidebar: Danh mục -->
+			<aside class="col-md-3 animate__animated animate__fadeInLeft">
+				<div class="category-sidebar">
+					<h2 class="mb-4 fw-bold text-dark">Danh mục</h2>
+					<ul class="list-group">
+						<!-- Mục "Tất cả sản phẩm" sử dụng icon Font Awesome -->
+						<li class="list-group-item rounded mb-2 category-item"><a
+							th:href="@{/home/index}"
+							class="text-decoration-none text-dark d-flex align-items-center justify-content-center py-2">
+								<span class="all-text">Tất cả sản phẩm</span>
+						</a></li>
+						<li th:each="category : ${categories}"
+							class="list-group-item rounded mb-2 category-item"
+							th:classappend="${category.id == selectedCategoryId} ? ' active' : ''">
+							<a th:href="@{/products/category/{id}(id=${category.id})}"
+							class="text-decoration-none text-dark d-flex align-items-center justify-content-center py-2">
+								<img th:src="@{/photos/{logo}(logo=${category.logo})}"
+								alt="Logo" class="category-logo" />
+						</a>
+						</li>
+					</ul>
+				</div>
+			</aside>
+
+			<!-- Main content: Sản phẩm -->
+			<section class="col-md-9 animate__animated animate__fadeIn">
+				<div class="product-container">
+					<div
+						class="d-flex flex-wrap justify-content-between align-items-center sort-section">
+						<h2 class="fw-bold text-dark mb-2 col-12 col-md-auto">Sản
+							phẩm nổi bật</h2>
+
+						<div class="d-flex align-items-center gap-2 col-12 col-md-auto">
+							<label for="sortPrice" class="form-label mb-0 text-nowrap">Sắp
+								xếp theo:</label> <select id="sortPrice" class="form-select sort-select"
+								onchange="location = this.value;">
+								<option th:value="@{/home/index}"
+									th:selected="${currentOrder == null}">Mặc định</option>
+								<option th:value="@{/home/sort(order='asc')}"
+									th:selected="${currentOrder == 'asc'}">Giá thấp - cao</option>
+								<option th:value="@{/home/sort(order='desc')}"
+									th:selected="${currentOrder == 'desc'}">Giá cao - thấp</option>
+							</select>
+						</div>
+					</div>
+					<div
+						class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+						<div class="col" th:each="product : ${products}">
+							<div class="card h-100 product-card">
+								<img th:src="@{/photos/{filename}(filename=${product.image})}"
+									class="card-img-top" alt="Product image" loading="lazy">
+								<div class="card-body">
+									<h5 class="card-title text-dark" th:text="${product.name}"></h5>
+									<div class="d-flex justify-content-between align-items-center">
+										<p class="price mb-0"
+											th:text="'$' + ${product.formattedPrice}"></p>
+										<span class="badge bg-secondary"
+											th:text="'Còn lại: ' + ${product.quantity}"></span>
+									</div>
+								</div>
+								<div class="card-footer bg-transparent border-top-0 text-center">
+									<button class="btn btn-custom btn-sm w-100"
+										th:attr="ng-click='addToCart(' + ${product.id} + ',' + ${product.quantity} + ',' + ${product.price} + ')'">
+										<i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pagination">
+					<!-- First Page Button -->
+					<a th:if="${selectedCategoryId != null}"
+						th:href="@{/products/category/{id}(id=${selectedCategoryId}, page=0)}"
+						th:classappend="${currentPage == 0} ? ' disabled' : ''"
+						class="pagination-btn" title="First"> <i
+						class="fas fa-angle-double-left"></i>
+					</a> <a th:if="${selectedCategoryId == null and currentOrder == null}"
+						th:href="@{/home/index(page=0)}"
+						th:classappend="${currentPage == 0} ? ' disabled' : ''"
+						class="pagination-btn" title="First"> <i
+						class="fas fa-angle-double-left"></i>
+					</a> <a th:if="${currentOrder != null}"
+						th:href="@{/home/sort(order=${currentOrder}, page=0)}"
+						th:classappend="${currentPage == 0} ? ' disabled' : ''"
+						class="pagination-btn" title="First"> <i
+						class="fas fa-angle-double-left"></i>
+					</a>
+
+					<!-- Previous Page Button -->
+					<a th:if="${selectedCategoryId != null}"
+						th:href="@{/products/category/{id}(id=${selectedCategoryId}, page=${currentPage - 1})}"
+						th:classappend="${currentPage == 0} ? ' disabled' : ''"
+						class="pagination-btn" title="Previous"> <i
+						class="fas fa-angle-left"></i>
+					</a> <a th:if="${selectedCategoryId == null and currentOrder == null}"
+						th:href="@{/home/index(page=${currentPage - 1})}"
+						th:classappend="${currentPage == 0} ? ' disabled' : ''"
+						class="pagination-btn" title="Previous"> <i
+						class="fas fa-angle-left"></i>
+					</a> <a th:if="${currentOrder != null}"
+						th:href="@{/home/sort(order=${currentOrder}, page=${currentPage - 1})}"
+						th:classappend="${currentPage == 0} ? ' disabled' : ''"
+						class="pagination-btn" title="Previous"> <i
+						class="fas fa-angle-left"></i>
+					</a>
+
+					<!-- Next Page Button -->
+					<a th:if="${selectedCategoryId != null}"
+						th:href="@{/products/category/{id}(id=${selectedCategoryId}, page=${currentPage + 1})}"
+						th:classappend="${currentPage == totalPages - 1} ? ' disabled' : ''"
+						class="pagination-btn" title="Next"> <i
+						class="fas fa-angle-right"></i>
+					</a> <a th:if="${selectedCategoryId == null and currentOrder == null}"
+						th:href="@{/home/index(page=${currentPage + 1})}"
+						th:classappend="${currentPage == totalPages - 1} ? ' disabled' : ''"
+						class="pagination-btn" title="Next"> <i
+						class="fas fa-angle-right"></i>
+					</a> <a th:if="${currentOrder != null}"
+						th:href="@{/home/sort(order=${currentOrder}, page=${currentPage + 1})}"
+						th:classappend="${currentPage == totalPages - 1} ? ' disabled' : ''"
+						class="pagination-btn" title="Next"> <i
+						class="fas fa-angle-right"></i>
+					</a>
+
+					<!-- Last Page Button -->
+					<a th:if="${selectedCategoryId != null}"
+						th:href="@{/products/category/{id}(id=${selectedCategoryId}, page=${totalPages - 1})}"
+						th:classappend="${currentPage == totalPages - 1} ? ' disabled' : ''"
+						class="pagination-btn" title="Last"> <i
+						class="fas fa-angle-double-right"></i>
+					</a> <a th:if="${selectedCategoryId == null and currentOrder == null}"
+						th:href="@{/home/index(page=${totalPages - 1})}"
+						th:classappend="${currentPage == totalPages - 1} ? ' disabled' : ''"
+						class="pagination-btn" title="Last"> <i
+						class="fas fa-angle-double-right"></i>
+					</a> <a th:if="${currentOrder != null}"
+						th:href="@{/home/sort(order=${currentOrder}, page=${totalPages - 1})}"
+						th:classappend="${currentPage == totalPages - 1} ? ' disabled' : ''"
+						class="pagination-btn" title="Last"> <i
+						class="fas fa-angle-double-right"></i>
+					</a>
+				</div>
+			</section>
+		</article>
+	</div>
+</body>
+</html>

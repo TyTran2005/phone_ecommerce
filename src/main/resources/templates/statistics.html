@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout_admin::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<title>Thống kê</title>
+</head>
+<body>
+	<article>
+		<div class="container">
+			<h1 class="animate__animated animate__fadeInDown">Thống kê</h1>
+			<section class="stat-section">
+				<h2>Doanh thu theo loại hàng</h2>
+				<a th:href="@{/admin/statistics/export/category}" class="btn-export">Xuất
+					PDF</a>
+				<table class="stat-table">
+					<thead>
+						<tr>
+							<th>Loại hàng</th>
+							<th>Tổng doanh thu</th>
+							<th>Tổng số lượng</th>
+							<th>Giá cao nhất</th>
+							<th>Giá thấp nhất</th>
+							<th>Giá trung bình</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="stat : ${categoryStats}">
+							<td th:text="${stat.categoryName}">Loại hàng</td>
+							<td th:text="${stat.totalRevenue}">0.00</td>
+							<td th:text="${stat.totalQuantity}">0</td>
+							<td th:text="${stat.maxPrice}">0.00</td>
+							<td th:text="${stat.minPrice}">0.00</td>
+							<td th:text="${stat.avgPrice}">0.00</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			<section class="stat-section">
+				<h2>Khách hàng VIP</h2>
+				<a th:href="@{/admin/statistics/export/vip}" class="btn-export">Xuất
+					PDF</a>
+				<table class="stat-table">
+					<thead>
+						<tr>
+							<th>Tên khách hàng</th>
+							<th>Tổng tiền đã mua</th>
+							<th>Ngày mua đầu tiên</th>
+							<th>Ngày mua sau cùng</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="vip : ${vipStats}">
+							<td th:text="${vip.username}">Tên khách hàng</td>
+							<td th:text="${vip.totalSpent}">0.00</td>
+							<td
+								th:text="${#temporals.format(vip.firstOrderDate, 'dd/MM/yyyy HH:mm')}">01/01/2020
+								10:00</td>
+							<td
+								th:text="${#temporals.format(vip.lastOrderDate, 'dd/MM/yyyy HH:mm')}">01/01/2020
+								10:00</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+		</div>
+	</article>
+</body>
+</html>

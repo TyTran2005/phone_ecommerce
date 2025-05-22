@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kích hoạt tài khoản - ShopOnline</title>
+</head>
+<body>
+	<article class="row mt-4">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 col-lg-4">
+					<div class="card activation-card animate__animated animate__fadeIn">
+						<div class="card-body">
+							<h4 class="card-title text-center mb-4">Kích hoạt tài khoản</h4>
+							<!-- Hiển thị thông báo lỗi nếu có -->
+							<div th:if="${error}" class="alert alert-danger" role="alert"
+								th:text="${error}"></div>
+							<!-- Hiển thị thông báo thành công nếu có -->
+							<div th:if="${success}" class="alert alert-success" role="alert"
+								th:text="${success}"></div>
+							<form th:action="@{/account/activate}" method="post">
+								<!-- Ô nhập username với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-user icon-input"></i> <input type="text"
+										id="username" name="username" class="form-control with-icon"
+										placeholder="Tên đăng nhập" required>
+								</div>
+								<!-- Ô nhập email với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-envelope icon-input"></i> <input type="email"
+										id="email" name="email" class="form-control with-icon"
+										placeholder="Email" required>
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary">Kích
+										hoạt</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<p class="text-center mt-3" style="color: #666;">
+				Tài khoản đã kích hoạt? <a href="/auth/login"
+					style="color: #333; text-decoration: none;">Đăng nhập</a>
+			</p>
+		</div>
+	</article>
+</body>
+</html>

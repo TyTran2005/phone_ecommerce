@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xác thực kích hoạt - ShopOnline</title>
+</head>
+<body>
+	<article class="row mt-4">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 col-lg-4">
+					<div
+						class="card verify-activation-card animate__animated animate__fadeIn">
+						<div class="card-body">
+							<h4 class="card-title text-center mb-4">Xác thực kích hoạt</h4>
+							<!-- Hiển thị thông báo lỗi nếu có -->
+							<div th:if="${error}" class="alert alert-danger" role="alert"
+								th:text="${error}"></div>
+							<!-- Hiển thị thông báo thành công nếu có -->
+							<div th:if="${success}" class="alert alert-success" role="alert"
+								th:text="${success}"></div>
+							<form th:action="@{/account/verify-activation}" method="post">
+								<div class="mb-3">
+									<input type="text" id="code" name="code" class="form-control"
+										placeholder="Nhập mã kích hoạt" required>
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary">Xác thực</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+</body>
+</html>

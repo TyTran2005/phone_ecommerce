@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng ký - ShopOnline</title>
+</head>
+<body>
+	<article class="row mt-4">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 col-lg-4">
+					<div class="card register-card animate__animated animate__fadeIn">
+						<div class="card-body">
+							<h4 class="card-title text-center mb-4">Đăng ký</h4>
+							<!-- Hiển thị thông báo lỗi nếu có -->
+							<div th:if="${error}" class="alert alert-danger" role="alert"
+								th:text="${error}"></div>
+							<form th:action="@{/register}" method="post">
+								<!-- Ô nhập username với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-user icon-input"></i> <input type="text"
+										id="username" name="username" class="form-control with-icon"
+										placeholder="Tên đăng nhập" required>
+								</div>
+								<!-- Ô nhập email với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-envelope icon-input"></i> <input type="email"
+										id="email" name="email" class="form-control with-icon"
+										placeholder="Email" required>
+								</div>
+								<!-- Ô nhập họ tên với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-id-card icon-input"></i> <input type="text"
+										id="fullname" name="fullname" class="form-control with-icon"
+										placeholder="Họ và tên" required>
+								</div>
+								<!-- Ô nhập mật khẩu với icon và toggle ẩn/hiện -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-lock icon-input"></i> <input type="password"
+										id="password" name="password" class="form-control with-icon"
+										placeholder="Mật khẩu" required> <i
+										class="fas fa-eye-slash toggle-icon" id="togglePassword"></i>
+								</div>
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-lock icon-input"></i> <input type="password"
+										id="confirmPassword" name="confirmPassword"
+										class="form-control with-icon" placeholder="Nhập lại mật khẩu"
+										required> <i class="fas fa-eye-slash toggle-icon"
+										id="toggleConfirmPassword"></i>
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary">Đăng ký</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<p class="text-center mt-3" style="color: #666;">
+				Đã có tài khoản? <a href="/auth/login"
+					style="color: #333; text-decoration: none;">Đăng nhập</a>
+			</p>
+		</div>
+		<script>
+			document
+					.addEventListener(
+							"DOMContentLoaded",
+							function() {
+								// Toggle cho password
+								const togglePassword = document
+										.getElementById('togglePassword');
+								const passwordInput = document
+										.getElementById('password');
+								if (togglePassword && passwordInput) {
+									togglePassword
+											.addEventListener(
+													'click',
+													function() {
+														if (passwordInput
+																.getAttribute('type') === 'password') {
+															passwordInput
+																	.setAttribute(
+																			'type',
+																			'text');
+															this.classList
+																	.remove('fa-eye-slash');
+															this.classList
+																	.add('fa-eye');
+														} else {
+															passwordInput
+																	.setAttribute(
+																			'type',
+																			'password');
+															this.classList
+																	.remove('fa-eye');
+															this.classList
+																	.add('fa-eye-slash');
+														}
+													});
+								}
+
+								// Toggle cho confirm password
+								const toggleConfirmPassword = document
+										.getElementById('toggleConfirmPassword');
+								const confirmPasswordInput = document
+										.getElementById('confirmPassword');
+								if (toggleConfirmPassword
+										&& confirmPasswordInput) {
+									toggleConfirmPassword
+											.addEventListener(
+													'click',
+													function() {
+														if (confirmPasswordInput
+																.getAttribute('type') === 'password') {
+															confirmPasswordInput
+																	.setAttribute(
+																			'type',
+																			'text');
+															this.classList
+																	.remove('fa-eye-slash');
+															this.classList
+																	.add('fa-eye');
+														} else {
+															confirmPasswordInput
+																	.setAttribute(
+																			'type',
+																			'password');
+															this.classList
+																	.remove('fa-eye');
+															this.classList
+																	.add('fa-eye-slash');
+														}
+													});
+
+								}
+							});
+		</script>
+	</article>
+</body>
+</html>

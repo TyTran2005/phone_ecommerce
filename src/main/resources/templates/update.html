@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cập nhật thông tin - ShopOnline</title>
+<!-- Các file CSS như Bootstrap, Font Awesome và style.css được load qua layout -->
+</head>
+<body>
+	<article class="row mt-4">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 col-lg-4">
+					<div class="card update-card animate__animated animate__fadeIn">
+						<div class="card-body">
+							<h4 class="card-title text-center mb-4">Cập nhật thông tin</h4>
+							<!-- Hiển thị thông báo lỗi nếu có -->
+							<div th:if="${error}" class="alert alert-danger" role="alert"
+								th:text="${error}"></div>
+							<div th:if="${success}" class="alert alert-success" role="alert"
+								th:text="${success}"></div>
+							<form th:action="@{/account/update}" method="post">
+								<!-- Username (read-only) với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-user icon-input"></i> <input type="text"
+										id="username" name="username" class="form-control with-icon"
+										th:value="${account.username}" readonly>
+								</div>
+								<!-- Email (cho phép chỉnh sửa) với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-envelope icon-input"></i> <input type="email"
+										id="email" name="email" class="form-control with-icon"
+										th:value="${account.email}" required>
+								</div>
+								<!-- Fullname (cho phép chỉnh sửa) với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-address-card icon-input"></i> <input
+										type="text" id="fullname" name="fullname"
+										class="form-control with-icon" th:value="${account.fullname}"
+										required>
+								</div>
+								<!-- Password (read-only) với icon -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-lock icon-input"></i> <input type="password"
+										id="password" name="password" class="form-control with-icon"
+										th:value="${account.password}" readonly>
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary">Cập nhật</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+</body>
+</html>

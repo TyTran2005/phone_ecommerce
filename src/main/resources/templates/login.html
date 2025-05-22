@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập - ShopOnline</title>
+</head>
+<body>
+	<article class="row mt-4">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 col-lg-4">
+					<div class="card login-card animate__animated animate__fadeIn">
+						<div class="card-body">
+							<h4 class="card-title text-center mb-4">Đăng nhập</h4>
+							<div th:if="${error}" class="alert alert-danger" role="alert"
+								th:text="${error}"></div>
+							<form th:action="@{/login}" method="post">
+								<!-- Ô nhập username/email có icon bên trái -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-user icon-input"></i> <input type="text"
+										id="username" name="username" class="form-control with-icon"
+										placeholder="Tên đăng nhập hoặc email"
+										th:value="${savedUsername}" required>
+								</div>
+								<!-- Ô nhập password có icon bên trái (lock) và icon toggle (eye) bên phải -->
+								<div class="mb-3 input-icon-container">
+									<i class="fas fa-lock icon-input"></i> <input type="password"
+										id="password" name="password" class="form-control with-icon"
+										placeholder="Mật khẩu" th:value="${savedPassword}"
+										required> <i class="fas fa-eye-slash toggle-icon"
+										id="togglePassword"></i>
+								</div>
+								<div class="form-check mb-3">
+									<input type="checkbox" id="rememberMe" name="remember-me"
+										class="form-check-input"> <label for="rememberMe"
+										class="form-check-label">Remember-me</label>
+								</div>
+								<div th:if="${redirectUrl != null}">
+									<input type="hidden" name="redirect" th:value="${redirectUrl}">
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="btn btn-primary">Đăng
+										nhập</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<p class="text-center mt-3" style="color: #666;">
+				Bạn chưa có tài khoản? <a href="/account/register"
+					style="color: #333; text-decoration: none;">Đăng Ký</a>
+			</p>
+			<p class="text-center mt-3" style="color: #666;">
+				Bạn chưa kích hoạt tài khoản? <a href="/account/activate"
+					style="color: #333; text-decoration: none;">Kích hoạt</a>
+			</p>
+		</div>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				const togglePassword = document
+						.getElementById('togglePassword');
+				const passwordInput = document.getElementById('password');
+
+				if (togglePassword && passwordInput) {
+					togglePassword.addEventListener('click', function() {
+						if (passwordInput.getAttribute('type') === 'password') {
+							// Nếu đang ẩn, chuyển thành hiển thị
+							passwordInput.setAttribute('type', 'text');
+							// Đổi icon thành "fa-eye"
+							this.classList.remove('fa-eye-slash');
+							this.classList.add('fa-eye');
+						} else {
+							// Nếu đang hiển thị, chuyển thành ẩn
+							passwordInput.setAttribute('type', 'password');
+							// Đổi icon thành "fa-eye-slash"
+							this.classList.remove('fa-eye');
+							this.classList.add('fa-eye-slash');
+						}
+					});
+				}
+			});
+		</script>
+	</article>
+</body>
+</html>

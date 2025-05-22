@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<title>Giỏ hàng - ShopOnline</title>
+<!-- Include your CSS and other head elements as needed -->
+</head>
+<body>
+	<article class="cart-container">
+		<input type="hidden" id="accountId"
+			th:value="${session.account != null ? session.account.id : 0}" />
+		<h2 class="cart-header">
+			<i class="fas fa-shopping-bag me-2"></i>Giỏ hàng của bạn
+		</h2>
+		<!-- Error message -->
+		<div class="alert alert-danger slide-down" role="alert"
+			ng-if="checkoutError" ng-bind="checkoutError"></div>
+
+		<!-- "Select All" checkbox -->
+		<div class="form-check mb-3">
+			<input type="checkbox" class="form-check-input" id="selectAll"
+				ng-model="selectAll" ng-change="toggleSelectAll(selectAll)">
+			<label class="form-check-label" for="selectAll">Chọn tất cả</label>
+		</div>
+
+		<!-- Cart Form: note that the buttons inside are type="button" so they don't submit the form -->
+		<form method="post" ng-submit="checkout()">
+			<div class="row g-4">
+				<!-- Left Column: List of Cart Items -->
+				<div class="col-lg-8">
+					<div ng-if="cartItems.length === 0" class="text-center py-4">
+						<i class="fas fa-shopping-cart fa-2x text-muted"></i>
+						<h5 class="text-muted my-3">Giỏ hàng của bạn hiện đang trống</h5>
+						<a href="/home/index" class="btn btn-primary">Mua sắm ngay</a>
+					</div>
+					<!-- Repeat each cart item -->
+					<div class="cart-item" ng-repeat="cart in cartItems">
+						<div class="form-check me-2">
+							<!-- Note the ng-change calls both updateTotal() and updateSelectAllStatus() -->
+							<input type="checkbox" class="form-check-input"
+								ng-model="cart.selected"
+								ng-change="updateTotal(); updateSelectAllStatus();">
+						</div>
+						<img ng-src="/photos/[[ cart.product.image ]]" alt="Product image"
+							class="product-thumbnail">
+						<div class="item-info">
+							<p class="product-title" ng-bind="cart.product.name"></p>
+							<p class="product-price">
+								$<span ng-bind="cart.product.price"></span>
+							</p>
+						</div>
+						<div class="quantity-control">
+							<!-- Make sure these buttons are type="button" -->
+							<button type="button"
+								class="btn btn-outline-secondary btn-sm quantity-btn minus"
+								ng-disabled="cart.quantity <= 1"
+								ng-click="updateQuantity(cart, -1)"></button>
+							<span class="quantity-display mx-2" ng-bind="cart.quantity"></span>
+							<button type="button"
+								class="btn btn-outline-secondary btn-sm quantity-btn plus"
+								ng-click="updateQuantity(cart, 1)"></button>
+						</div>
+						<button type="button" class="btn btn-link btn-remove"
+							ng-click="removeItem(cart)">
+							<i class="fas fa-trash-alt"></i>
+						</button>
+					</div>
+				</div>
+				<!-- Right Column: Checkout Summary -->
+				<div class="col-lg-4">
+					<div class="summary-card mb-3">
+						<div class="summary-title">Tổng thanh toán</div>
+						<div class="d-flex justify-content-between mb-2">
+							<span>Tạm tính:</span> <span id="subtotalAmount"
+								ng-bind="subtotal | currency"></span>
+						</div>
+						<div class="d-flex justify-content-between mb-2">
+							<span>Phí vận chuyển:</span> <span class="text-success">Miễn
+								phí</span>
+						</div>
+						<hr>
+						<div class="d-flex justify-content-between mb-2">
+							<strong>Tổng cộng:</strong> <strong id="totalAmount"
+								ng-bind="subtotal | currency"></strong>
+						</div>
+					</div>
+					<button type="submit" class="btn checkout-btn w-100">
+						<i class="fas fa-credit-card me-2"></i>Thanh toán ngay
+					</button>
+				</div>
+			</div>
+		</form>
+	</article>
+</body>
+</html>

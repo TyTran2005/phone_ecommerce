@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout_admin::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<title>Chi tiết Đơn hàng</title>
+<!-- Font Awesome for icons -->
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Link to order-detail.css (nếu có, hoặc có thể dùng chung order.css) -->
+<link rel="stylesheet" href="/css/order-detail.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+</head>
+<body>
+	<article>
+		<div class="container">
+			<h1 class="animate__animated animate__fadeInDown">Chi tiết Đơn
+				hàng</h1>
+
+			<!-- Thông tin đơn hàng -->
+			<div class="order-info">
+				<p>
+					<strong>ID Đơn hàng:</strong> <span th:text="${order.id}">1</span>
+				</p>
+				<p>
+					<strong>Ngày đặt:</strong> <span
+						th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2020
+						10:00</span>
+				</p>
+				<p>
+					<strong>Tổng tiền:</strong> <span th:text="${order.totalAmount}">0.00</span>
+				</p>
+				<p>
+					<strong>Trạng thái:</strong> <span th:text="${order.status}">Status</span>
+				</p>
+				<p>
+					<strong>Địa chỉ:</strong> <span th:text="${order.address}">Address</span>
+				</p>
+				<p>
+					<strong>SĐT:</strong> <span th:text="${order.phonenumber}">Phone</span>
+				</p>
+				<p>
+					<strong>Tài khoản:</strong> <span
+						th:text="${order.account.username}">Account</span>
+				</p>
+			</div>
+
+			<!-- Bảng chi tiết sản phẩm trong đơn hàng -->
+			<div class="table-container">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Sản phẩm</th>
+							<th>Ảnh</th>
+							<th>Số lượng</th>
+							<th>Giá</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="detail : ${order.orderDetails}">
+							<td th:text="${detail.product.name}">Tên sản phẩm</td>
+							<td><img th:if="${detail.product.image != null}"
+								th:src="@{'/photos/' + ${detail.product.image}}"
+								alt="Ảnh sản phẩm" width="50"></td>
+							<td th:text="${detail.quantity}">0</td>
+							<td th:text="${detail.price}">0.00</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="button-group">
+				<a href="/admin/order" class="btn btn-secondary"> <i
+					class="fa-solid fa-arrow-left"></i> Quay lại
+				</a>
+			</div>
+		</div>
+	</article>
+</body>
+</html>

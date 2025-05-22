@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đặt hàng - ShopOnline</title>
+</head>
+<body>
+	<article class="order-container">
+		<h2 class="order-header">
+			<i class="fas fa-receipt me-2"></i>Thông tin đặt hàng
+		</h2>
+		<div class="row g-4">
+			<!-- Left Column: Display Cart Items -->
+			<div class="col-lg-8">
+				<div th:if="${#lists.isEmpty(cartItems)}" class="text-center py-4">
+					<i class="fas fa-shopping-cart fa-2x text-muted"></i>
+					<h5 class="text-muted my-3">Bạn chưa có sản phẩm nào trong giỏ
+						hàng</h5>
+					<a href="/home/index" class="btn btn-primary">Mua sắm ngay</a>
+				</div>
+				<div th:each="cart : ${cartItems}" class="order-item">
+					<img th:src="@{/photos/{filename}(filename=${cart.product.image})}"
+						alt="Product image" class="product-thumbnail">
+					<div class="item-info">
+						<p class="product-title" th:text="${cart.product.name}"></p>
+						<p class="product-price" th:text="'$' + ${cart.product.price}"></p>
+						<p class="product-quantity"
+							th:text="'Số lượng: ' + ${cart.quantity}"></p>
+					</div>
+				</div>
+			</div>
+			<!-- Right Column: Order Form -->
+			<div class="col-lg-4">
+				<div class="order-summary">
+					<h5>Thông tin khách hàng</h5>
+					<form th:action="@{/order/submit}" method="post">
+						<!-- Fullname (read-only) -->
+						<div class="mb-3 input-icon-container">
+							<i class="fas fa-user icon-input-1"></i> <input type="text"
+								class="form-control with-icon" name="fullname"
+								th:value="${account.fullname}" readonly>
+						</div>
+						<!-- Address -->
+						<div class="mb-3 input-icon-container">
+							<i class="fas fa-map-marker-alt icon-input-1"></i> <input
+								type="text" class="form-control with-icon-1" name="address"
+								placeholder="Nhập địa chỉ giao hàng" required>
+						</div>
+						<!-- Phone number -->
+						<div class="mb-3 input-icon-container">
+							<i class="fas fa-phone icon-input-1"></i> <input type="text"
+								class="form-control with-icon-1" name="phonenumber"
+								placeholder="Nhập số điện thoại" required>
+						</div>
+						<!-- Hidden input for total amount -->
+						<input type="hidden" name="totalAmount" th:value="${totalAmount}">
+						<!-- Payment method (optional) -->
+						<h5 class="mt-4">Phương thức thanh toán</h5>
+						<div class="payment-method">
+							<div class="payment-card" data-value="cod"
+								onclick="document.getElementById('cod').click()">
+								<input class="form-check-input" type="radio"
+									name="paymentMethod" id="cod" value="cod" checked hidden>
+								<i class="fas fa-money-bill-wave cod-icon"></i> <span
+									class="fw-medium">COD</span> <small class="text-muted">Thanh
+									toán khi nhận hàng</small>
+							</div>
+							<div class="payment-card" data-value="zalopay"
+								onclick="document.getElementById('zalopay').click()">
+								<input class="form-check-input" type="radio"
+									name="paymentMethod" id="zalopay" value="zalopay" hidden>
+								<img th:src="@{/photos/zalopay.png}" class="zalopay-icon"
+									alt="ZaloPay Icon"
+									style="width: 40px; height: 40px; margin-bottom: 10px;">
+								<span class="fw-medium">ZaloPay</span> <small class="text-muted">Thanh
+									toán trực tuyến</small>
+							</div>
+						</div>
+						<!-- Order summary -->
+						<h5 class="mt-3">Tổng thanh toán</h5>
+						<div class="d-flex justify-content-between mb-3">
+							<span>Tạm tính:</span> <strong th:text="'$' + ${totalAmount}"></strong>
+						</div>
+						<div class="d-flex justify-content-between mb-3">
+							<span>Phí vận chuyển:</span> <strong class="text-success">Miễn
+								phí</strong>
+						</div>
+						<hr>
+						<div class="d-flex justify-content-between mb-3">
+							<strong>Tổng cộng:</strong> <strong
+								th:text="'$' + ${totalAmount}"></strong>
+						</div>
+						<button type="submit" class="btn checkout-btn w-100">
+							<i class="fas fa-credit-card me-2"></i>Đặt hàng ngay
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const paymentCards = document.querySelectorAll('.payment-card');
+  paymentCards.forEach(card => {
+    card.addEventListener('click', function(){
+      // Hủy trạng thái active và uncheck các radio của các thẻ khác
+      paymentCards.forEach(c => {
+        c.classList.remove('active');
+        const radio = c.querySelector('input[type="radio"]');
+        if(radio) {
+          radio.checked = false;
+        }
+      });
+      // Đặt trạng thái active cho thẻ được click và check radio bên trong
+      this.classList.add('active');
+      const radio = this.querySelector('input[type="radio"]');
+      if(radio) {
+        radio.checked = true;
+      }
+    });
+  });
+});
+</script>
+	</article>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout_admin::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý Đơn hàng</title>
+</head>
+<body>
+	<article ng-app="orderApp" ng-controller="OrderController">
+		<div class="container">
+			<h1 class="animate__animated animate__fadeInDown">Quản lý Đơn
+				hàng</h1>
+			<!-- Thông báo lỗi nếu có -->
+			<div class="alert alert-danger text-center" ng-if="error"
+				ng-bind="error"></div>
+			<div class="row">
+				<!-- Form sửa trạng thái đơn hàng -->
+				<div class="col-md-6">
+					<form id="orderForm" ng-submit="updateOrder()" novalidate>
+						<!-- Field ẩn cho id -->
+						<input type="hidden" ng-model="order.id">
+
+						<div class="form-group mb-3">
+							<label>Ngày đặt hàng</label> <input type="datetime-local"
+								class="form-control" ng-model="order.orderDate" disabled>
+						</div>
+
+						<div class="form-group mb-3">
+							<label>Tổng tiền</label> <input type="number"
+								class="form-control" ng-model="order.totalAmount" disabled>
+						</div>
+
+						<div class="form-group mb-3">
+							<label>Trạng thái</label> <select class="form-control"
+								ng-model="order.status" required>
+								<option value="Chờ xác nhận">Chờ xác nhận</option>
+								<option value="Đã xác nhận">Đã xác nhận</option>
+								<option value="Đang giao">Đang giao</option>
+								<option value="Hoàn thành">Hoàn thành</option>
+								<option value="Đã hủy">Đã hủy</option>
+							</select>
+						</div>
+
+						<div class="form-group mb-3">
+							<label>Địa chỉ</label> <input type="text" class="form-control"
+								ng-model="order.address" disabled>
+						</div>
+
+						<div class="form-group mb-3">
+							<label>SĐT</label> <input type="text" class="form-control"
+								ng-model="order.phonenumber" disabled>
+						</div>
+
+						<div class="button-group">
+							<button type="submit" class="btn btn-success" ng-if="order.id">
+								<i class="fa-solid fa-pen-to-square"></i> Sửa trạng thái
+							</button>
+							<button type="button" class="btn btn-secondary"
+								ng-click="resetForm()">
+								<i class="fa-solid fa-rotate-left"></i> Reset
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<!-- Danh sách đơn hàng -->
+				<div class="col-md-6">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Ngày đặt</th>
+								<th>Tổng tiền</th>
+								<th>Trạng thái</th>
+								<th>Địa chỉ</th>
+								<th>SĐT</th>
+								<th>Tài khoản</th>
+								<th style="width: 120px;">Hành động</th>
+								<!-- Điều chỉnh cột hành động -->
+								<th style="width: 150px;">Xem chi tiết</th>
+								<!-- Thu nhỏ cột "Xem chi tiết" -->
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="o in orders">
+								<td ng-bind="o.id"></td>
+								<td ng-bind="o.orderDate | date:'dd/MM/yyyy HH:mm'"></td>
+								<td ng-bind="o.totalAmount | currency"></td>
+								<td ng-bind="o.status"></td>
+								<td ng-bind="o.address"></td>
+								<td ng-bind="o.phonenumber"></td>
+								<td ng-bind="o.account.username"></td>
+								<td>
+									<button type="button" class="btn btn-info btn-sm"
+										ng-click="editOrder(o)">
+										<i class="fa-solid fa-edit"></i> Edit
+									</button>
+									<button type="button" class="btn btn-danger btn-sm"
+										ng-click="deleteOrder(o.id)">
+										<i class="fa-solid fa-trash"></i> Delete
+									</button>
+								</td>
+								<td>
+									<button type="button" class="btn btn-secondary btn-sm"
+										ng-click="viewOrderDetails(o.id)">Xem chi tiết</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<!-- Phân trang -->
+					<div class="pagination">
+						<button class="page-link" ng-click="goToPage(0)"
+							ng-disabled="currentPage == 0">
+							<i class="fas fa-angle-double-left"></i>
+						</button>
+						<button class="page-link" ng-click="goToPage(currentPage - 1)"
+							ng-disabled="currentPage == 0">
+							<i class="fas fa-angle-left"></i>
+						</button>
+						<button class="page-link" ng-click="goToPage(currentPage + 1)"
+							ng-disabled="currentPage >= totalPages - 1">
+							<i class="fas fa-angle-right"></i>
+						</button>
+						<button class="page-link" ng-click="goToPage(totalPages - 1)"
+							ng-disabled="currentPage >= totalPages - 1">
+							<i class="fas fa-angle-double-right"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<!-- Hiển thị thông báo lỗi nếu có -->
+		<div class="alert alert-danger" ng-if="error" ng-bind="error"></div>
+	</article>
+</body>
+</html>

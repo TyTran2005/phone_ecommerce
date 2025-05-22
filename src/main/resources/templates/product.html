@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{/layout_admin::view(~{::title}, ~{::article})}">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý Hàng Hóa</title>
+</head>
+<body>
+	<article class="container" ng-app="productApp"
+		ng-controller="ProductController">
+		<h1 class="animate__animated animate__fadeInDown">Quản lý Hàng
+			Hóa</h1>
+		<div class="alert alert-danger text-center" ng-if="error"
+			ng-bind="error"></div>
+		<div class="row">
+			<!-- Form thêm/sửa sản phẩm -->
+			<div class="col-md-6">
+				<form id="productForm" enctype="multipart/form-data">
+					<input type="hidden" name="id" ng-model="item.id">
+					<div class="form-group mb-3">
+						<label for="name"><i class="fa-solid fa-tag"></i> Tên Hàng</label>
+						<input type="text" class="form-control" name="name"
+							ng-model="item.name" placeholder="Nhập tên hàng hóa" required>
+					</div>
+					<div class="form-group mb-3">
+						<label for="price"><i class="fa-solid fa-dollar-sign"></i>
+							Giá</label> <input type="text" class="form-control" name="price"
+							ng-model="item.price" placeholder="Nhập giá" required>
+					</div>
+					<div class="form-group mb-3">
+						<label for="quantity"><i class="fa-solid fa-boxes-stacked"></i>
+							Số lượng</label> <input type="text" class="form-control" name="quantity"
+							ng-model="item.quantity" placeholder="Nhập số lượng" required>
+					</div>
+					<div class="form-group mb-3">
+						<label for="category"><i class="fa-solid fa-list"></i>
+							Loại hàng</label>
+						<!-- Removed track by to avoid conversion issues -->
+						<select class="form-control" ng-model="item.categoryId"
+							ng-options="cat.id as cat.name for cat in categories" required>
+							<option value="">-- Chọn loại hàng --</option>
+						</select>
+					</div>
+					<div class="mb-4">
+						<label class="form-label fw-bold mb-2">Ảnh</label> <label
+							class="upload-label w-100"> <i
+							class="fas fa-cloud-upload-alt fa-2x mb-3 text-primary"></i>
+							<div class="text-muted">Kéo thả file hoặc click để tải lên</div>
+							<input type="file" class="d-none" id="image" name="imageFile"
+							accept="image/*" onchange="previewImage(this)">
+						</label>
+						<div id="fileNameDisplay" class="file-name"></div>
+						<div id="imagePreviewContainer" class="mt-3 text-center">
+							<img id="imagePreview" src="" alt="Image Preview"
+								class="logo-preview" style="max-width: 180px; display: none;">
+						</div>
+					</div>
+					<div class="button-group">
+						<button type="button" class="btn btn-primary"
+							ng-click="!item.id && createProduct()" ng-if="!item.id">
+							<i class="fa-solid fa-plus"></i> Thêm
+						</button>
+						<button type="button" class="btn btn-success"
+							ng-click="item.id && updateProduct()" ng-if="item.id">
+							<i class="fa-solid fa-pen-to-square"></i> Sửa
+						</button>
+						<button type="button" class="btn btn-secondary"
+							ng-click="resetForm()">
+							<i class="fa-solid fa-rotate-left"></i> Reset
+						</button>
+					</div>
+				</form>
+			</div>
+			<!-- Bảng danh sách sản phẩm -->
+			<div class="col-md-6">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Tên Hàng</th>
+							<th>Giá</th>
+							<th>Số lượng</th>
+							<th>Loại hàng</th>
+							<th>Ảnh</th>
+							<th>Hành động</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="prod in products">
+							<td ng-bind="prod.id"></td>
+							<td ng-bind="prod.name"></td>
+							<td ng-bind="prod.price"></td>
+							<td ng-bind="prod.quantity"></td>
+							<td ng-bind="prod.category.name"></td>
+							<td><img ng-if="prod.image"
+								ng-src="/photos/[[ prod.image ]]" alt="Image" width="50"
+								class="table-logo"></td>
+							<td>
+								<button type="button" class="btn btn-info btn-sm"
+									ng-click="editProduct(prod)">
+									<i class="fa-solid fa-edit"></i> Edit
+								</button>
+								<button type="button" class="btn btn-danger btn-sm"
+									ng-click="deleteProduct(prod.id)">
+									<i class="fa-solid fa-trash"></i> Delete
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- Phân trang -->
+				<div class="pagination">
+					<a class="page-link" ng-click="goToPage(0)"
+						ng-class="{'disabled': page === 0}"> <i
+						class="fa-solid fa-angles-left"></i>
+					</a> <a class="page-link" ng-click="goToPage(page - 1)"
+						ng-class="{'disabled': page === 0}"> <i
+						class="fa-solid fa-angle-left"></i>
+					</a> <a class="page-link" ng-click="goToPage(page + 1)"
+						ng-class="{'disabled': page >= totalPages - 1}"> <i
+						class="fa-solid fa-angle-right"></i>
+					</a> <a class="page-link" ng-click="goToPage(totalPages - 1)"
+						ng-class="{'disabled': page >= totalPages - 1}"> <i
+						class="fa-solid fa-angles-right"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+		<!-- JavaScript xử lý file input -->
+		<script>
+			document.getElementById('image').addEventListener(
+					'change',
+					function() {
+						var fileNameDisplay = document
+								.getElementById('fileNameDisplay');
+						if (this.files && this.files.length > 0) {
+							fileNameDisplay.textContent = "Đã chọn file: "
+									+ this.files[0].name;
+						} else {
+							fileNameDisplay.textContent = "";
+						}
+					});
+		</script>
+	</article>
+</body>
+</html>
