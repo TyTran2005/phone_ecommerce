@@ -37,24 +37,24 @@ public class ChatBotRestController {
     private OrderDetailService orderDetailService;
 
     @PostMapping
-    public ResponseEntity<?> chat(@RequestBody Map<String, String> body) {
-        String question = body.get("question");
+    public ResponseEntity<?> chat(@RequestBody Map<String, Object> body) {
+        String question = (String) body.get("question");
         Integer accountId = null;
         if (body.containsKey("accountId")) {
             try {
-                accountId = Integer.valueOf(body.get("accountId"));
+                accountId = Integer.valueOf(body.get("accountId").toString());
             } catch (Exception ignored) {
             }
         }
+
+        List<Map<String, Object>> history = (List<Map<String, Object>>) body.get("history");
 
         if (question == null || question.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Missing question");
         }
 
         List<Product> products = productService.findAll();
-
         List<Cart> cartItems = accountId != null && accountId != 0 ? cartService.findByAccount(accountId) : List.of();
-
         List<Order> orders = accountId != null && accountId != 0 ? orderService.findByAccountId(accountId) : List.of();
 
         StringBuilder prompt = new StringBuilder();
@@ -111,17 +111,21 @@ public class ChatBotRestController {
 
         prompt.append(
                 "Trả lời câu hỏi sau dựa trên thông tin ở trên (sản phẩm, giỏ hàng, đơn hàng và chi tiết đơn hàng). Nếu không chắc chắn, hãy đề nghị người dùng hỏi cụ thể hơn.\n");
-        prompt.append("Câu hỏi: ").append(question);
 
-        // Gửi đến Gemini
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="
                 + geminiApiKey;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> content = Map.of("parts", List.of(Map.of("text", prompt.toString())));
-        Map<String, Object> request = Map.of("contents", List.of(content));
+        List<Map<String, Object>> contents = new ArrayList<>();
+        if (history != null) {
+            contents.addAll(history);
+        }
+        contents.add(
+                Map.of("role", "user", "parts", List.of(Map.of("text", prompt.toString() + "Câu hỏi: " + question))));
+
+        Map<String, Object> request = Map.of("contents", contents); // Pass the entire contents list
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 
         try {

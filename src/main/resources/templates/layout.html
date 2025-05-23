@@ -27,12 +27,19 @@
 		</div>
 	</main>
 
-	<div id="chatbot-box"
-		style="position:fixed;bottom:20px;right:20px;width:300px;background:#fff;border:1px solid #ccc;padding:10px;">
-		<div id="chatbot-messages" style="height:200px;overflow-y:auto;"></div>
-		<input id="chatbot-input" type="text" placeholder="Hỏi gì đi..." style="width:80%;">
-		<button onclick="sendChat()">Gửi</button>
+	<div id="chatbot-container">
+		<div id="chatbot-toggle" onclick="toggleChat()">
+			<i id="chatbot-icon" class="fas fa-comment-dots"></i>
+		</div>
+		<div id="chatbot-box" style="display: none;">
+			<div id="chatbot-messages"></div>
+			<div id="chatbot-input-area">
+				<input id="chatbot-input" type="text" placeholder="Hỏi gì đi..." />
+				<button onclick="sendChat()">Gửi</button>
+			</div>
+		</div>
 	</div>
+
 
 	<!-- Footer -->
 	<footer class="footer mt-5 bg-dark">
@@ -108,20 +115,37 @@
 
 			document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 		});
+		// Inside your <script> tags or in a separate JS file
+		let conversationHistory = []; // Declare this globally or within the scope of your chatbot functions
+
 		function appendMessage(msg, sender) {
 			const div = document.createElement('div');
-			div.textContent = (sender === 'user' ? 'Bạn: ' : 'Bot: ') + msg;
+			div.classList.add('message', sender);
+			div.textContent = msg;
 			document.getElementById('chatbot-messages').appendChild(div);
+			const messages = document.getElementById('chatbot-messages');
+			messages.scrollTop = messages.scrollHeight;
+
+			// Add message to history
+			conversationHistory.push({ role: sender === 'user' ? 'user' : 'model', text: msg });
 		}
 
 		function sendChat() {
 			const input = document.getElementById('chatbot-input');
 			const msg = input.value;
 			if (!msg.trim()) return;
-			appendMessage(msg, 'user');
-			input.value = ''; 
+			appendMessage(msg, 'user'); // This already adds to history
+
+			input.value = '';
+
 			const accountId = document.getElementById('accountId').value;
-			const payload = { question: msg };
+
+			// Prepare the payload, including the entire conversation history
+			const payload = {
+				question: msg,
+				history: conversationHistory.map(item => ({ role: item.role, parts: [{ text: item.text }] }))
+			};
+
 			if (accountId && accountId !== "0") payload.accountId = accountId;
 
 			fetch('/api/chatbot', {
@@ -130,9 +154,24 @@
 				body: JSON.stringify(payload)
 			})
 				.then(res => res.json())
-				.then(data => appendMessage(data.answer, 'bot'))
+				.then(data => appendMessage(data.answer, 'bot')) // This already adds to history
 				.catch(() => appendMessage('Có lỗi xảy ra!', 'bot'));
 		}
+
+		function toggleChat() {
+			const box = document.getElementById('chatbot-box');
+			const icon = document.getElementById('chatbot-icon');
+			if (box.style.display === 'none') {
+				box.style.display = 'flex';
+				icon.classList.remove('fa-comment-dots');
+				icon.classList.add('fa-times');
+			} else {
+				box.style.display = 'none';
+				icon.classList.remove('fa-times');
+				icon.classList.add('fa-comment-dots');
+			}
+		}
+
 	</script>
 
 	<input type="hidden" id="accountId" th:value="${session.account != null ? session.account.id : 0}" />
