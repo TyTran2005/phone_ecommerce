@@ -1,6 +1,5 @@
 package com.poly.test;
 
-import com.poly.controller.ProductController;
 import com.poly.entity.Account;
 import com.poly.entity.Category;
 import com.poly.entity.Product;
@@ -31,7 +30,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest

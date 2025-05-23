@@ -1,24 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 	th:fragment="view(title, content)" ng-app="cartApp">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title th:replace="${title}">ShopOnline</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-<link rel="stylesheet" th:href="@{/css/style.css}" />
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
-<!-- Bao gồm file cart.js -->
-<script src="/js/cart.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:replace="${title}">ShopOnline</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+	<!-- Bao gồm file cart.js -->
+	<script src="/js/cart.js"></script>
 </head>
+
 <body ng-controller="CartController">
 
 	<!-- Navigation -->
@@ -30,6 +26,13 @@
 			<article th:replace="${content}">CONTENT</article>
 		</div>
 	</main>
+
+	<div id="chatbot-box"
+		style="position:fixed;bottom:20px;right:20px;width:300px;background:#fff;border:1px solid #ccc;padding:10px;">
+		<div id="chatbot-messages" style="height:200px;overflow-y:auto;"></div>
+		<input id="chatbot-input" type="text" placeholder="Hỏi gì đi..." style="width:80%;">
+		<button onclick="sendChat()">Gửi</button>
+	</div>
 
 	<!-- Footer -->
 	<footer class="footer mt-5 bg-dark">
@@ -50,32 +53,27 @@
 					<h5 class="text-white-50 fw-normal mb-3">Liên hệ</h5>
 					<ul class="list-unstyled small">
 						<li class="mb-2"><a href="mailto:support@shoponline.com"
-							class="text-secondary text-decoration-none"> <i
-								class="fas fa-envelope me-2"></i>thety22112005@gmail.com
-						</a></li>
-						<li><a href="tel:19001234"
-							class="text-secondary text-decoration-none"> <i
-								class="fas fa-phone me-2"></i>1900 1234
-						</a></li>
+								class="text-secondary text-decoration-none"> <i
+									class="fas fa-envelope me-2"></i>thety22112005@gmail.com
+							</a></li>
+						<li><a href="tel:19001234" class="text-secondary text-decoration-none"> <i
+									class="fas fa-phone me-2"></i>1900 1234
+							</a></li>
 					</ul>
 				</div>
 
 				<!-- Social Media Column -->
 				<div class="col-md-4 text-center text-md-end">
 					<h5 class="text-white-50 fw-normal mb-3">Kết nối với chúng tôi</h5>
-					<div
-						class="d-flex justify-content-center justify-content-md-end gap-3">
-						<a href="https://www.facebook.com/tran.the.ty.2024"
-							target="_blank" class="text-secondary text-decoration-none">
+					<div class="d-flex justify-content-center justify-content-md-end gap-3">
+						<a href="https://www.facebook.com/tran.the.ty.2024" target="_blank"
+							class="text-secondary text-decoration-none">
 							<i class="fab fa-facebook fa-lg"></i>
 						</a> <a href="https://www.instagram.com/tytran2005/" target="_blank"
-							class="text-secondary text-decoration-none"> <i
-							class="fab fa-instagram fa-lg"></i>
+							class="text-secondary text-decoration-none"> <i class="fab fa-instagram fa-lg"></i>
 						</a> <a href="https://www.youtube.com/@TranTheTy-A" target="_blank"
-							class="text-secondary text-decoration-none"> <i
-							class="fab fa-youtube fa-lg"></i>
-						</a> <a
-							href="https://www.tiktok.com/@funnytiktok9089?is_from_webapp=1&sender_device=pc"
+							class="text-secondary text-decoration-none"> <i class="fab fa-youtube fa-lg"></i>
+						</a> <a href="https://www.tiktok.com/@funnytiktok9089?is_from_webapp=1&sender_device=pc"
 							target="_blank" class="text-secondary text-decoration-none">
 							<i class="fab fa-tiktok fa-lg"></i>
 						</a>
@@ -96,21 +94,48 @@
 	</footer>
 
 	<!-- Scripts -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-        // Xử lý animation khi scroll
-        document.addEventListener('DOMContentLoaded', function() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate__animated', 'animate__fadeInUp');
-                    }
-                });
-            }, { threshold: 0.1 });
+		// Xử lý animation khi scroll
+		document.addEventListener('DOMContentLoaded', function () {
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+					}
+				});
+			}, { threshold: 0.1 });
 
-            document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
-        });
-    </script>
+			document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+		});
+		function appendMessage(msg, sender) {
+			const div = document.createElement('div');
+			div.textContent = (sender === 'user' ? 'Bạn: ' : 'Bot: ') + msg;
+			document.getElementById('chatbot-messages').appendChild(div);
+		}
+
+		function sendChat() {
+			const input = document.getElementById('chatbot-input');
+			const msg = input.value;
+			if (!msg.trim()) return;
+			appendMessage(msg, 'user');
+			input.value = ''; 
+			const accountId = document.getElementById('accountId').value;
+			const payload = { question: msg };
+			if (accountId && accountId !== "0") payload.accountId = accountId;
+
+			fetch('/api/chatbot', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			})
+				.then(res => res.json())
+				.then(data => appendMessage(data.answer, 'bot'))
+				.catch(() => appendMessage('Có lỗi xảy ra!', 'bot'));
+		}
+	</script>
+
+	<input type="hidden" id="accountId" th:value="${session.account != null ? session.account.id : 0}" />
 </body>
+
 </html>

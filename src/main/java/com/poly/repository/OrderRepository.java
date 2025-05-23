@@ -1,8 +1,6 @@
 package com.poly.repository;
 
 import com.poly.entity.Order;
-import com.poly.entity.Product;
-
 import java.util.List;
 
 import org.springframework.data.domain.Page;

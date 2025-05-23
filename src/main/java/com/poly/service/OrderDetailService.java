@@ -15,4 +15,6 @@ public interface OrderDetailService {
 	OrderDetail update(OrderDetail orderDetail);
 
 	void delete(Long id);
+
+	List<OrderDetail> findByOrderId(Integer orderId);
 }
