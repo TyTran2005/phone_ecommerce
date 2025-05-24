@@ -115,38 +115,68 @@
 
 			document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 		});
-		// Inside your <script> tags or in a separate JS file
-		let conversationHistory = []; // Declare this globally or within the scope of your chatbot functions
+
+		let conversationHistory = [];
+
+		// Load history from localStorage on page load
+		document.addEventListener('DOMContentLoaded', function () {
+			const storedHistory = localStorage.getItem('chatbotHistory');
+			if (storedHistory) {
+				conversationHistory = JSON.parse(storedHistory);
+				conversationHistory.forEach(item => {
+					appendMessage(item.text, item.role === 'user' ? 'user' : 'bot');
+				});
+			}
+
+			// Animate on scroll
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+					}
+				});
+			}, { threshold: 0.1 });
+
+			document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+		});
 
 		function appendMessage(msg, sender) {
 			const div = document.createElement('div');
 			div.classList.add('message', sender);
-			div.textContent = msg;
+
+			if (sender === 'bot') {
+				div.innerHTML = marked.parse(msg); // markdown to HTML
+			} else {
+				div.textContent = msg;
+			}
+
 			document.getElementById('chatbot-messages').appendChild(div);
 			const messages = document.getElementById('chatbot-messages');
 			messages.scrollTop = messages.scrollHeight;
 
-			// Add message to history
+			// Save message to history and localStorage
 			conversationHistory.push({ role: sender === 'user' ? 'user' : 'model', text: msg });
+			localStorage.setItem('chatbotHistory', JSON.stringify(conversationHistory));
 		}
 
 		function sendChat() {
 			const input = document.getElementById('chatbot-input');
 			const msg = input.value;
 			if (!msg.trim()) return;
-			appendMessage(msg, 'user'); // This already adds to history
 
+			appendMessage(msg, 'user');
 			input.value = '';
 
 			const accountId = document.getElementById('accountId').value;
 
-			// Prepare the payload, including the entire conversation history
 			const payload = {
 				question: msg,
 				history: conversationHistory.map(item => ({ role: item.role, parts: [{ text: item.text }] }))
 			};
 
-			if (accountId && accountId !== "0") payload.accountId = accountId;
+			if (accountId && accountId !== "0") {
+				payload.accountId = accountId;
+			}
 
 			fetch('/api/chatbot', {
 				method: 'POST',
@@ -154,7 +184,7 @@
 				body: JSON.stringify(payload)
 			})
 				.then(res => res.json())
-				.then(data => appendMessage(data.answer, 'bot')) // This already adds to history
+				.then(data => appendMessage(data.answer, 'bot'))
 				.catch(() => appendMessage('Có lỗi xảy ra!', 'bot'));
 		}
 
@@ -171,8 +201,10 @@
 				icon.classList.add('fa-comment-dots');
 			}
 		}
-
 	</script>
+
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 
 	<input type="hidden" id="accountId" th:value="${session.account != null ? session.account.id : 0}" />
 </body>
