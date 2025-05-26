@@ -31,8 +31,14 @@
 		<div id="chatbot-toggle" onclick="toggleChat()">
 			<i id="chatbot-icon" class="fas fa-comment-dots"></i>
 		</div>
+
 		<div id="chatbot-box" style="display: none;">
+			<div id="header_chatbot">Trợ lý AI</div>
 			<div id="chatbot-messages"></div>
+			<button id="scroll-down-btn" onclick="scrollToBottom()" style="display: none;">
+				<i class="fas fa-arrow-down"></i>
+			</button>
+
 			<div id="chatbot-input-area">
 				<input id="chatbot-input" type="text" placeholder="Hỏi gì đi..." />
 				<button onclick="sendChat()">Gửi</button>
@@ -100,10 +106,8 @@
 		</div>
 	</footer>
 
-	<!-- Scripts -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-		// Xử lý animation khi scroll
 		document.addEventListener('DOMContentLoaded', function () {
 			const observer = new IntersectionObserver((entries) => {
 				entries.forEach(entry => {
@@ -116,19 +120,27 @@
 			document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 		});
 
+		const messagesBox = document.getElementById('chatbot-messages');
+		const scrollDownBtn = document.getElementById('scroll-down-btn');
+
+		messagesBox.addEventListener('scroll', () => {
+			const nearBottom = messagesBox.scrollHeight - messagesBox.scrollTop <= messagesBox.clientHeight + 50;
+			scrollDownBtn.style.display = nearBottom ? 'none' : 'block';
+		});
+
+		function scrollToBottom() {
+			messagesBox.scrollTop = messagesBox.scrollHeight;
+			scrollDownBtn.style.display = 'none';
+		}
+
 		let conversationHistory = [];
 
-		// Load history from localStorage on page load
 		document.addEventListener('DOMContentLoaded', function () {
-			const storedHistory = localStorage.getItem('chatbotHistory');
+			const storedHistory = sessionStorage.getItem('chatbotHistory');
 			if (storedHistory) {
 				conversationHistory = JSON.parse(storedHistory);
-				conversationHistory.forEach(item => {
-					appendMessage(item.text, item.role === 'user' ? 'user' : 'bot');
-				});
 			}
 
-			// Animate on scroll
 			const observer = new IntersectionObserver((entries) => {
 				entries.forEach(entry => {
 					if (entry.isIntersecting) {
@@ -138,25 +150,36 @@
 			}, { threshold: 0.1 });
 
 			document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+			document.getElementById('chatbot-input').addEventListener('keydown', function (event) {
+				if (event.key === 'Enter' && !event.shiftKey) {
+					event.preventDefault(); // Ngăn xuống dòng
+					sendChat(); // Gửi tin nhắn
+				}
+			});
+
 		});
 
 		function appendMessage(msg, sender) {
 			const div = document.createElement('div');
 			div.classList.add('message', sender);
 
-			if (sender === 'bot') {
-				div.innerHTML = marked.parse(msg); // markdown to HTML
-			} else {
-				div.textContent = msg;
-			}
+			const label = document.createElement('div');
+			label.style.fontWeight = 'bold';
+			label.style.marginBottom = '3px';
+			label.textContent = sender === 'bot' ? 'Trợ lý AI:' : 'Tôi:';
+			div.appendChild(label);
+
+			const content = document.createElement('div');
+			content.innerHTML = sender === 'bot' ? marked.parse(msg) : msg;
+			div.appendChild(content);
 
 			document.getElementById('chatbot-messages').appendChild(div);
+
 			const messages = document.getElementById('chatbot-messages');
 			messages.scrollTop = messages.scrollHeight;
 
-			// Save message to history and localStorage
 			conversationHistory.push({ role: sender === 'user' ? 'user' : 'model', text: msg });
-			localStorage.setItem('chatbotHistory', JSON.stringify(conversationHistory));
+			sessionStorage.setItem('chatbotHistory', JSON.stringify(conversationHistory));
 		}
 
 		function sendChat() {
@@ -166,6 +189,19 @@
 
 			appendMessage(msg, 'user');
 			input.value = '';
+
+			const typingDiv = document.createElement('div');
+			typingDiv.classList.add('message', 'bot');
+			typingDiv.id = 'typing-indicator';
+			typingDiv.innerHTML = `
+		<span><strong>Trợ lý AI:</strong></span>
+		<div class="typing-indicator">
+			<span></span><span></span><span></span>
+		</div>
+	`;
+			document.getElementById('chatbot-messages').appendChild(typingDiv);
+			const messages = document.getElementById('chatbot-messages');
+			messages.scrollTop = messages.scrollHeight;
 
 			const accountId = document.getElementById('accountId').value;
 
@@ -184,23 +220,39 @@
 				body: JSON.stringify(payload)
 			})
 				.then(res => res.json())
-				.then(data => appendMessage(data.answer, 'bot'))
-				.catch(() => appendMessage('Có lỗi xảy ra!', 'bot'));
+				.then(data => {
+					document.getElementById('typing-indicator')?.remove();
+					appendMessage(data.answer, 'bot');
+				})
+				.catch(() => {
+					document.getElementById('typing-indicator')?.remove();
+					appendMessage('Có lỗi xảy ra!', 'bot');
+				});
 		}
 
 		function toggleChat() {
 			const box = document.getElementById('chatbot-box');
 			const icon = document.getElementById('chatbot-icon');
+
 			if (box.style.display === 'none') {
 				box.style.display = 'flex';
 				icon.classList.remove('fa-comment-dots');
 				icon.classList.add('fa-times');
+
+				const messagesBox = document.getElementById('chatbot-messages');
+				if (messagesBox.children.length === 0 && conversationHistory.length > 0) {
+					conversationHistory.forEach(item => {
+						appendMessage(item.text, item.role === 'user' ? 'user' : 'bot');
+					});
+				}
 			} else {
 				box.style.display = 'none';
 				icon.classList.remove('fa-times');
 				icon.classList.add('fa-comment-dots');
 			}
 		}
+
+
 	</script>
 
 	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
